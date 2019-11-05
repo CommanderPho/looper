@@ -63,6 +63,9 @@ class MainWindow(QMainWindow):
         self.ui.button_timestamp_browse.clicked.connect(
             self.browse_timestamp_handler
         )
+        self.ui.button_timestamp_create.clicked.connect(
+            self.create_timestamp_file_handler
+        )
         self.ui.button_video_browse.clicked.connect(
             self.browse_video_handler
         )
@@ -382,6 +385,19 @@ class MainWindow(QMainWindow):
         )
         if not tmp_name:
             return
+        self.set_timestamp_filename(QDir.toNativeSeparators(tmp_name))
+
+    def create_timestamp_file_handler(self):
+        """
+        Handler when the timestamp file create button is clicked
+        """
+        tmp_name, _ = QFileDialog.getSaveFileName(
+            self, "Create New Timestamp file", None,
+            "Timestamp File (*.tmsp);;All Files (*)"
+        )
+        if not tmp_name:
+            return
+        # Create new file:
         self.set_timestamp_filename(QDir.toNativeSeparators(tmp_name))
 
     def _sort_model(self):
