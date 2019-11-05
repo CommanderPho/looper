@@ -397,6 +397,30 @@ class MainWindow(QMainWindow):
         )
         if not tmp_name:
             return
+
+        try:
+            if (os.stat(QDir.toNativeSeparators(tmp_name)).st_size == 0):
+                    # File is empty, create a non-empty one:
+                    with open(QDir.toNativeSeparators(tmp_name), "w") as fh:
+                        fh.write("[]")  # Write the minimal valid JSON string to the file to allow it to be used
+            else:
+                pass
+
+            # with open(tmp_name, 'r') as fh:
+            #     if fh.__sizeof__()>0:
+            #         # File is not empty:
+            #         pass
+            #     else:
+            #         # File is empty, create a non-empty one:
+            #         fh.close()
+            #         with open(tmp_name, "w") as fh:
+            #             fh.write("[]")  # Write the minimal valid JSON string to the file to allow it to be used
+
+        except WindowsError:
+            with open(tmp_name, "w") as fh:
+                fh.write("[]") # Write the minimal valid JSON string to the file to allow it to be used
+
+
         # Create new file:
         self.set_timestamp_filename(QDir.toNativeSeparators(tmp_name))
 
