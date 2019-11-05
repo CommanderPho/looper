@@ -70,6 +70,13 @@ class MainWindow(QMainWindow):
             self.browse_video_handler
         )
 
+
+        # Set up directional buttons
+        self.ui.btnSkipLeft.clicked.connect(self.skip_left_handler)
+        self.ui.btnSkipRight.clicked.connect(self.skip_right_handler)
+        self.ui.btnLeft.clicked.connect(self.seek_left_handler)
+        self.ui.btnRight.clicked.connect(self.seek_right_handler)
+
         self.play_pause_model = ToggleButtonModel(None, self)
         self.play_pause_model.setStateMap(
             {
@@ -352,6 +359,52 @@ class MainWindow(QMainWindow):
             self.media_player.play()
         self.media_is_playing = not self.media_is_playing
         self.play_pause_model.setState(not self.media_is_playing)
+
+
+    def seek_left_handler(self):
+        print('seek: left')
+        self.seek_frames(-10)
+
+    def skip_left_handler(self):
+        print('skip: left')
+        self.seek_frames(-1)
+
+    def seek_right_handler(self):
+        print('seek: right')
+        self.seek_frames(10)
+
+    def skip_right_handler(self):
+        print('skip: right')
+        self.seek_frames(1)
+
+    def seek_frames(self, relativeFrameOffset):
+        """Jump a certain number of frames forward or back
+        """
+        if self.video_filename is None:
+            self._show_error("No video file chosen")
+            return
+        # if self.media_end_time == -1:
+        #     return
+        try:
+            didPauseMedia = False
+            if self.media_is_playing:
+                self.media_player.pause()
+                didPauseMedia = True
+
+            #newPosition = self.media_player.get_position() + relativeFrameOffset
+            newTime = self.media_player.get_time() + relativeFrameOffset
+
+            self.update_slider_highlight()
+            self.media_player.set_time(newTime)
+
+            if (didPauseMedia):
+                self.media_player.play()
+
+            print("Setting media playback time to ", newTime)
+        except Exception as ex:
+            self._show_error(str(ex))
+            print(traceback.format_exc())
+
 
     def toggle_full_screen(self):
         if self.is_full_screen:

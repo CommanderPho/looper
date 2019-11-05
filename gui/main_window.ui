@@ -296,70 +296,19 @@
             <number>0</number>
            </property>
            <layout class="QGridLayout" name="gridLayout_2">
-            <item row="1" column="7">
-             <widget class="ToggleButton" name="button_mute_toggle">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
+            <item row="0" column="0" colspan="14">
+             <widget class="HighlightedJumpSlider" name="slider_progress">
+              <property name="maximum">
+               <number>9999</number>
               </property>
-              <property name="toolTip">
-               <string>Toggle Mute/Unmute</string>
+              <property name="pageStep">
+               <number>1</number>
               </property>
-              <property name="text">
-               <string>Mute</string>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
               </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QPushButton" name="button_speed_up">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="toolTip">
-               <string>Speed up the video</string>
-              </property>
-              <property name="text">
-               <string>Speed Up</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="ToggleButton" name="button_play_pause">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="toolTip">
-               <string>Toggle Play/Pause</string>
-              </property>
-              <property name="text">
-               <string>Play/Pause</string>
-              </property>
-              <property name="checkable">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="5">
-             <widget class="QPushButton" name="button_full_screen">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="toolTip">
-               <string>Set the video to full screen</string>
-              </property>
-              <property name="text">
-               <string>Full Screen</string>
+              <property name="tickPosition">
+               <enum>QSlider::NoTicks</enum>
               </property>
              </widget>
             </item>
@@ -379,7 +328,65 @@
               </property>
              </widget>
             </item>
+            <item row="1" column="3">
+             <widget class="QPushButton" name="button_mark_start">
+              <property name="toolTip">
+               <string>Mark the start of the entry</string>
+              </property>
+              <property name="text">
+               <string>Mark Start</string>
+              </property>
+             </widget>
+            </item>
             <item row="1" column="8">
+             <widget class="QToolButton" name="btnLeft">
+              <property name="toolTip">
+               <string>Jump Frames Left</string>
+              </property>
+              <property name="text">
+               <string>&lt;</string>
+              </property>
+              <property name="shortcut">
+               <string>Left</string>
+              </property>
+              <property name="arrowType">
+               <enum>Qt::LeftArrow</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="9">
+             <widget class="QToolButton" name="btnRight">
+              <property name="toolTip">
+               <string>Jump Frames Right</string>
+              </property>
+              <property name="text">
+               <string>&gt;</string>
+              </property>
+              <property name="shortcut">
+               <string>Right</string>
+              </property>
+              <property name="arrowType">
+               <enum>Qt::RightArrow</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="12">
+             <widget class="ToggleButton" name="button_mute_toggle">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string>Toggle Mute/Unmute</string>
+              </property>
+              <property name="text">
+               <string>Mute</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="13">
              <widget class="HighlightedJumpSlider" name="slider_volume">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -401,19 +408,16 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="0" colspan="9">
-             <widget class="HighlightedJumpSlider" name="slider_progress">
-              <property name="maximum">
-               <number>9999</number>
+            <item row="1" column="7">
+             <widget class="QToolButton" name="btnSkipLeft">
+              <property name="toolTip">
+               <string>Skip Frames Left</string>
               </property>
-              <property name="pageStep">
-               <number>1</number>
+              <property name="text">
+               <string>&lt;-</string>
               </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="tickPosition">
-               <enum>QSlider::NoTicks</enum>
+              <property name="shortcut">
+               <string>Ctrl+Left</string>
               </property>
              </widget>
             </item>
@@ -430,13 +434,51 @@
               </property>
              </spacer>
             </item>
-            <item row="1" column="3">
-             <widget class="QPushButton" name="button_mark_start">
+            <item row="1" column="0">
+             <widget class="ToggleButton" name="button_play_pause">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="toolTip">
-               <string>Mark the start of the entry</string>
+               <string>Toggle Play/Pause</string>
               </property>
               <property name="text">
-               <string>Mark Start</string>
+               <string>Play/Pause</string>
+              </property>
+              <property name="checkable">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="11">
+             <spacer name="horizontalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="5">
+             <widget class="QPushButton" name="button_full_screen">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string>Set the video to full screen</string>
+              </property>
+              <property name="text">
+               <string>Full Screen</string>
               </property>
              </widget>
             </item>
@@ -447,6 +489,35 @@
               </property>
               <property name="text">
                <string>Mark End</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QPushButton" name="button_speed_up">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string>Speed up the video</string>
+              </property>
+              <property name="text">
+               <string>Speed Up</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="10">
+             <widget class="QToolButton" name="btnSkipRight">
+              <property name="toolTip">
+               <string>Skip Frames Right</string>
+              </property>
+              <property name="text">
+               <string>-&gt;</string>
+              </property>
+              <property name="shortcut">
+               <string>Ctrl+Right</string>
               </property>
              </widget>
             </item>
