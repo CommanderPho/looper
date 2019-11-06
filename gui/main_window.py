@@ -58,6 +58,25 @@ class MainWindow(QMainWindow):
         self.ui.frame_video.wheel.connect(self.wheel_handler)
         self.ui.frame_video.keyPressed.connect(self.key_handler)
 
+        # Set up Labels:
+        # self.ui.lblVideoName.
+
+        # self.displayed_video_title = bind("self.ui.lblVideoName", "text", str)
+        self.ui.lblVideoName.setText(self.video_filename)
+        self.ui.lblVideoSubtitle.setText("")
+        self.ui.dateTimeEdit.setHidden(True)
+        self.ui.lblCurrentFrame.setText("")
+        self.ui.lblTotalFrames.setText("")
+
+        self.ui.lblCurrentTime.setText("")
+        self.ui.lblTotalDuration.setText("")
+
+        self.ui.lblFileFPS.setText("")
+
+        self.ui.spinBoxFrameJumpMultiplier.value = 1
+
+
+
         # Set up buttons
         self.ui.button_run.clicked.connect(self.run)
         self.ui.button_timestamp_browse.clicked.connect(
@@ -221,6 +240,10 @@ class MainWindow(QMainWindow):
         self.ui.slider_progress.setValue(
             self.media_player.get_position() * 10000
         )
+        #print(self.media_player.get_position() * 10000)
+
+        self.update_video_file_play_labels()
+
         # When the video finishes
         self.ui.slider_progress.blockSignals(False)
         if self.media_started_playing and \
@@ -360,22 +383,90 @@ class MainWindow(QMainWindow):
         self.media_is_playing = not self.media_is_playing
         self.play_pause_model.setState(not self.media_is_playing)
 
+    def update_video_file_play_labels(self):
+        curr_total_fps = self.media_player.get_fps()
+        curr_total_duration = self.media_player.get_length()
+        totalNumFrames = int(curr_total_duration * curr_total_fps)
+        if totalNumFrames > 0:
+            self.ui.lblTotalFrames.setText(str(totalNumFrames))
+        else:
+            self.ui.lblTotalFrames.setText("--")
+        if curr_total_duration > 0:
+            self.ui.lblTotalDuration.setText(str(curr_total_duration))  # Gets duration in [ms]
+        else:
+            self.ui.lblTotalDuration.setText("--")
+
+        # Changing Values: Dynamically updated each time the playhead changes
+        curr_percent_complete = self.media_player.get_position()  # Current percent complete between 0.0 and 1.0
+
+        if curr_percent_complete >= 0:
+            self.ui.lblPlaybackPercent.setText(str(curr_percent_complete))
+        else:
+            self.ui.lblPlaybackPercent.setText("--")
+
+        curr_frame = int(round(curr_percent_complete * totalNumFrames))
+
+        if curr_frame >= 0:
+            self.ui.lblCurrentFrame.setText(str(curr_frame))
+        else:
+            self.ui.lblCurrentFrame.setText("--")
+
+        if self.media_player.get_time() >= 0:
+            self.ui.lblCurrentTime.setText(str(self.media_player.get_time()) + "[ms]")  # Gets time in [ms]
+        else:
+            self.ui.lblCurrentTime.setText("-- [ms]")  # Gets time in [ms]
+
+
+
+
+
+
+    # Called only when the video file changes:
+    def update_video_file_labels_on_file_change(self):
+        if self.video_filename is None:
+            self.ui.lblVideoName.setText("")
+        else:
+            self.ui.lblVideoName.setText(self.video_filename)
+            # Only updated when the video file is changed:
+            curr_total_fps = self.media_player.get_fps()
+            self.ui.lblFileFPS.setText(str(curr_total_fps))
+
+            curr_total_duration = self.media_player.get_length()
+            totalNumFrames = int(curr_total_duration * curr_total_fps)
+            if totalNumFrames > 0:
+                self.ui.lblTotalFrames.setText(str(totalNumFrames))
+            else:
+                self.ui.lblTotalFrames.setText("--")
+
+            if curr_total_duration > 0:
+                self.ui.lblTotalDuration.setText(str(curr_total_duration)) # Gets duration in [ms]
+            else:
+                self.ui.lblTotalDuration.setText("--")
+
+            self.update_video_file_play_labels()
+
+    def get_frame_multipler(self):
+        return self.ui.spinBoxFrameJumpMultiplier.value
+
+    # def compute_total_number_frames(self):
+    #     self.media_player.get_length()
+
 
     def seek_left_handler(self):
         print('seek: left')
-        self.seek_frames(-10)
+        self.seek_frames(-10.0 * self.get_frame_multipler())
 
     def skip_left_handler(self):
         print('skip: left')
-        self.seek_frames(-1)
+        self.seek_frames(-1.0 * self.get_frame_multipler())
 
     def seek_right_handler(self):
         print('seek: right')
-        self.seek_frames(10)
+        self.seek_frames(10.0 * self.get_frame_multipler())
 
     def skip_right_handler(self):
         print('skip: right')
-        self.seek_frames(1)
+        self.seek_frames(1.0 * self.get_frame_multipler())
 
     def seek_frames(self, relativeFrameOffset):
         """Jump a certain number of frames forward or back
@@ -573,6 +664,8 @@ class MainWindow(QMainWindow):
             elif sys.platform == "darwin": # for MacOS
                 self.media_player.set_nsobject(self.ui.frame_video.winId())
             self.ui.entry_video.setText(self.video_filename)
+
+            self.update_video_file_labels_on_file_change()
             self.media_started_playing = False
             self.media_is_playing = False
             self.set_volume(self.ui.slider_volume.value())
