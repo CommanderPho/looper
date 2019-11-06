@@ -476,26 +476,39 @@ class MainWindow(QMainWindow):
             return
         # if self.media_end_time == -1:
         #     return
+
+        curr_total_fps = self.media_player.get_fps()
+        relativeSecondsOffset = relativeFrameOffset / curr_total_fps # Desired offset in seconds
+        curr_total_duration = self.media_player.get_length()
+        relative_percent_offset = relativeSecondsOffset / curr_total_duration # percent of the whole that we want to skip
+
+
+
+
+        totalNumFrames = int(curr_total_duration * curr_total_fps)
+
         try:
             didPauseMedia = False
             if self.media_is_playing:
                 self.media_player.pause()
                 didPauseMedia = True
 
-            #newPosition = self.media_player.get_position() + relativeFrameOffset
-            newTime = int(self.media_player.get_time() + relativeFrameOffset)
+            newPosition = self.media_player.get_position() + relative_percent_offset
+            # newTime = int(self.media_player.get_time() + relativeFrameOffset)
 
             # self.update_slider_highlight()
-            self.media_player.set_time(newTime)
+            # self.media_player.set_time(newTime)
+            self.media_player.set_position(newPosition)
 
             if (didPauseMedia):
                 self.media_player.play()
-            else:
-                # Otherwise, the media was already paused, we need to very quickly play the media to update the frame with the new time, and then immediately pause it again.
-                self.media_player.play()
-                self.media_player.pause()
+            # else:
+            #     # Otherwise, the media was already paused, we need to very quickly play the media to update the frame with the new time, and then immediately pause it again.
+            #     self.media_player.play()
+            #     self.media_player.pause()
+            self.media_player.next_frame()
 
-            print("Setting media playback time to ", newTime)
+            print("Setting media playback time to ", newPosition)
         except Exception as ex:
             self._show_error(str(ex))
             print(traceback.format_exc())
