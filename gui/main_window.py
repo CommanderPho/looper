@@ -69,6 +69,9 @@ class MainWindow(QMainWindow):
         self.ui.lblVideoSubtitle.setText("")
         self.ui.dateTimeEdit.setHidden(True)
         self.ui.lblCurrentFrame.setText("")
+        self.ui.spinBoxCurrentFrame.setEnabled(False)
+        self.ui.spinBoxCurrentFrame.setValue(1)
+        self.ui.spinBoxCurrentFrame.valueChanged.connect(self.handle_frame_value_changed)
         self.ui.lblTotalFrames.setText("")
 
         self.ui.lblCurrentTime.setText("")
@@ -284,6 +287,10 @@ class MainWindow(QMainWindow):
     def set_volume(self, new_volume):
         self.media_player.audio_set_volume(new_volume)
 
+    def handle_frame_value_changed(self, newProposedFrame):
+        # Tries to change the frame to the user provided one.
+        ## TODO:
+        print(newProposedFrame)
 
     # Playback Speed/Rate:
     def speed_changed_handler(self, val):
@@ -404,10 +411,19 @@ class MainWindow(QMainWindow):
 
         curr_frame = int(round(curr_percent_complete * totalNumFrames))
 
+        # Disable frame change on spinBox update to prevent infinite loop
+        self.ui.spinBoxCurrentFrame.blockSignals(True)
         if curr_frame >= 0:
             self.ui.lblCurrentFrame.setText(str(curr_frame))
+            #self.ui.spinBoxCurrentFrame.setValue(curr_frame)
+            #self.ui.spinBoxCurrentFrame.setEnabled(True)
         else:
             self.ui.lblCurrentFrame.setText("--")
+            #self.ui.spinBoxCurrentFrame.setEnabled(False)
+            #self.ui.spinBoxCurrentFrame.setValue(1)
+
+        # Re-enable signals from the frame spin box after update
+        self.ui.spinBoxCurrentFrame.blockSignals(False)
 
         if self.media_player.get_time() >= 0:
             self.ui.lblCurrentTime.setText(str(self.media_player.get_time()) + "[ms]")  # Gets time in [ms]
@@ -428,8 +444,12 @@ class MainWindow(QMainWindow):
             totalNumFrames = self.get_media_total_num_frames()
             if totalNumFrames > 0:
                 self.ui.lblTotalFrames.setText(str(totalNumFrames))
+                self.ui.spinBoxCurrentFrame.setMaximum(totalNumFrames)
+                self.ui.spinBoxCurrentFrame.setEnabled(True)
             else:
                 self.ui.lblTotalFrames.setText("--")
+                self.ui.spinBoxCurrentFrame.setEnabled(False)
+                self.ui.spinBoxCurrentFrame.setMaximum(1)
 
             if curr_total_duration > 0:
                 self.ui.lblTotalDuration.setText(str(curr_total_duration)) # Gets duration in [ms]
