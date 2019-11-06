@@ -34,7 +34,7 @@ class MainWindow(QMainWindow):
         self.media_started_playing = False
         self.media_is_playing = False
         self.original_geometry = None
-        self.mute = False
+
 
         self.timestamp_model = TimestampModel(None, self)
         self.proxy_model = QSortFilterProxyModel(self)
@@ -112,22 +112,6 @@ class MainWindow(QMainWindow):
         self.ui.button_play_pause.setModel(self.play_pause_model)
         self.ui.button_play_pause.clicked.connect(self.play_pause)
 
-        self.mute_model = ToggleButtonModel(None, self)
-        self.mute_model.setStateMap(
-            {
-                True: {
-                    "text": "",
-                    "icon": qta.icon("fa.volume-up", scale_factor=0.8)
-                },
-                False: {
-                    "text": "",
-                    "icon": qta.icon("fa.volume-off", scale_factor=0.8)
-                }
-            }
-        )
-        self.ui.button_mute_toggle.setModel(self.mute_model)
-        self.ui.button_mute_toggle.clicked.connect(self.toggle_mute)
-
         self.ui.button_full_screen.setIcon(
             qta.icon("ei.fullscreen", scale_factor=0.6)
         )
@@ -167,7 +151,8 @@ class MainWindow(QMainWindow):
 
         self.ui.slider_progress.setTracking(False)
         self.ui.slider_progress.valueChanged.connect(self.set_media_position)
-        self.ui.slider_volume.valueChanged.connect(self.set_volume)
+
+        # self.ui.slider_volume.valueChanged.connect(self.set_volume)
         self.ui.entry_description.setReadOnly(True)
 
         # Mapper between the table and the entry detail
@@ -176,7 +161,7 @@ class MainWindow(QMainWindow):
         self.ui.button_save.clicked.connect(self.mapper.submit)
 
         # Set up default volume
-        self.set_volume(self.ui.slider_volume.value())
+        # self.set_volume(self.ui.slider_volume.value())
 
         self.vlc_events = self.media_player.event_manager()
         self.vlc_events.event_attach(
@@ -252,7 +237,7 @@ class MainWindow(QMainWindow):
             # Apparently we need to reset the media, otherwise the player
             # won't play at all
             self.media_player.set_media(self.media_player.get_media())
-            self.set_volume(self.ui.slider_volume.value())
+            # self.set_volume(self.ui.slider_volume.value())
             self.media_is_playing = False
             self.media_started_playing = False
             self.run()
@@ -276,12 +261,8 @@ class MainWindow(QMainWindow):
             self.play_pause()
 
     def wheel_handler(self, event):
-        self.modify_volume(1 if event.angleDelta().y() > 0 else -1)
-
-    def toggle_mute(self):
-        self.media_player.audio_set_mute(not self.media_player.audio_get_mute())
-        self.mute = not self.mute
-        self.mute_model.setState(not self.mute)
+        # self.modify_volume(1 if event.angleDelta().y() > 0 else -1)
+        self.set_media_position(1 if event.angleDelta().y() > 0 else -1)
 
     def modify_volume(self, delta_percent):
         new_volume = self.media_player.audio_get_volume() + delta_percent
@@ -290,7 +271,7 @@ class MainWindow(QMainWindow):
         elif new_volume > 40:
             new_volume = 40
         self.media_player.audio_set_volume(new_volume)
-        self.ui.slider_volume.setValue(self.media_player.audio_get_volume())
+        # self.ui.slider_volume.setValue(self.media_player.audio_get_volume())
 
     def set_volume(self, new_volume):
         self.media_player.audio_set_volume(new_volume)
@@ -416,11 +397,6 @@ class MainWindow(QMainWindow):
         else:
             self.ui.lblCurrentTime.setText("-- [ms]")  # Gets time in [ms]
 
-
-
-
-
-
     # Called only when the video file changes:
     def update_video_file_labels_on_file_change(self):
         if self.video_filename is None:
@@ -447,10 +423,6 @@ class MainWindow(QMainWindow):
 
     def get_frame_multipler(self):
         return self.ui.spinBoxFrameJumpMultiplier.value
-
-    # def compute_total_number_frames(self):
-    #     self.media_player.get_length()
-
 
     def seek_left_handler(self):
         print('seek: left')
@@ -512,7 +484,6 @@ class MainWindow(QMainWindow):
         except Exception as ex:
             self._show_error(str(ex))
             print(traceback.format_exc())
-
 
     def toggle_full_screen(self):
         if self.is_full_screen:
@@ -685,7 +656,7 @@ class MainWindow(QMainWindow):
             self.update_video_file_labels_on_file_change()
             self.media_started_playing = False
             self.media_is_playing = False
-            self.set_volume(self.ui.slider_volume.value())
+            # self.set_volume(self.ui.slider_volume.value())
             self.play_pause_model.setState(True)
 
     def browse_video_handler(self):
