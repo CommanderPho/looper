@@ -75,8 +75,6 @@ class MainWindow(QMainWindow):
 
         self.ui.spinBoxFrameJumpMultiplier.value = 1
 
-
-
         # Set up buttons
         self.ui.button_run.clicked.connect(self.run)
         self.ui.button_timestamp_browse.clicked.connect(
@@ -117,6 +115,11 @@ class MainWindow(QMainWindow):
         )
         self.ui.button_full_screen.setText("")
         self.ui.button_full_screen.clicked.connect(self.toggle_full_screen)
+
+        # Playback Speed:
+        self.ui.doubleSpinBoxPlaybackSpeed.value = 1.0
+        self.ui.doubleSpinBoxPlaybackSpeed.valueChanged.connect(self.speed_changed_handler)
+
         self.ui.button_speed_up.clicked.connect(self.speed_up_handler)
         self.ui.button_speed_up.setIcon(
             qta.icon("fa.arrow-circle-o-up", scale_factor=0.8)
@@ -127,6 +130,7 @@ class MainWindow(QMainWindow):
             qta.icon("fa.arrow-circle-o-down", scale_factor=0.8)
         )
         self.ui.button_slow_down.setText("")
+
         self.ui.button_mark_start.setIcon(
             qta.icon("fa.quote-left", scale_factor=0.7)
         )
@@ -275,6 +279,14 @@ class MainWindow(QMainWindow):
 
     def set_volume(self, new_volume):
         self.media_player.audio_set_volume(new_volume)
+
+
+    def speed_changed_handler(self, val):
+        print(val)
+        self.media_player.set_rate(val)
+        # self.media_player.set_rate(self.ui.doubleSpinBoxPlaybackSpeed.value())
+        # TODO: Fix playback speed. Print current playback rate (to a label or something, so the user can see).
+
 
     def speed_up_handler(self):
         self.modify_rate(0.1)
