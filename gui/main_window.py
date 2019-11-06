@@ -454,19 +454,19 @@ class MainWindow(QMainWindow):
 
     def seek_left_handler(self):
         print('seek: left')
-        self.seek_frames(-10.0 * self.get_frame_multipler())
+        self.seek_frames(-10 * self.get_frame_multipler())
 
     def skip_left_handler(self):
         print('skip: left')
-        self.seek_frames(-1.0 * self.get_frame_multipler())
+        self.seek_frames(-1 * self.get_frame_multipler())
 
     def seek_right_handler(self):
         print('seek: right')
-        self.seek_frames(10.0 * self.get_frame_multipler())
+        self.seek_frames(10 * self.get_frame_multipler())
 
     def skip_right_handler(self):
         print('skip: right')
-        self.seek_frames(1.0 * self.get_frame_multipler())
+        self.seek_frames(1 * self.get_frame_multipler())
 
     def seek_frames(self, relativeFrameOffset):
         """Jump a certain number of frames forward or back
@@ -483,13 +483,17 @@ class MainWindow(QMainWindow):
                 didPauseMedia = True
 
             #newPosition = self.media_player.get_position() + relativeFrameOffset
-            newTime = self.media_player.get_time() + relativeFrameOffset
+            newTime = int(self.media_player.get_time() + relativeFrameOffset)
 
-            self.update_slider_highlight()
+            # self.update_slider_highlight()
             self.media_player.set_time(newTime)
 
             if (didPauseMedia):
                 self.media_player.play()
+            else:
+                # Otherwise, the media was already paused, we need to very quickly play the media to update the frame with the new time, and then immediately pause it again.
+                self.media_player.play()
+                self.media_player.pause()
 
             print("Setting media playback time to ", newTime)
         except Exception as ex:
