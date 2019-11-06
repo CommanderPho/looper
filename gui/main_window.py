@@ -15,7 +15,10 @@ from PyQt5.QtCore import QDir, QTimer, Qt, QModelIndex, QSortFilterProxyModel
 from lib import vlc
 from app.model import TimestampModel, ToggleButtonModel, TimestampDelta
 
-
+"""
+The software displays/plays a video file with variable speed and navigation settings.
+The software runs a timer.
+"""
 class MainWindow(QMainWindow):
     """
     The main window class
@@ -91,8 +94,8 @@ class MainWindow(QMainWindow):
         # Set up directional buttons
         self.ui.btnSkipLeft.clicked.connect(self.skip_left_handler)
         self.ui.btnSkipRight.clicked.connect(self.skip_right_handler)
-        self.ui.btnLeft.clicked.connect(self.seek_left_handler)
-        self.ui.btnRight.clicked.connect(self.seek_right_handler)
+        self.ui.btnLeft.clicked.connect(self.step_left_handler)
+        self.ui.btnRight.clicked.connect(self.step_right_handler)
 
         self.play_pause_model = ToggleButtonModel(None, self)
         self.play_pause_model.setStateMap(
@@ -178,7 +181,7 @@ class MainWindow(QMainWindow):
 
         self.ui.show()
 
-
+    # Timestamp entries:
     def add_entry(self):
         if not self.timestamp_filename:
             self._show_error("You haven't chosen a timestamp file yet")
@@ -246,6 +249,7 @@ class MainWindow(QMainWindow):
             self.media_started_playing = False
             self.run()
 
+    # Event Handlers:
     def timer_handler(self):
         """
         This is a workaround, because for some reason we can't call set_time()
@@ -281,12 +285,12 @@ class MainWindow(QMainWindow):
         self.media_player.audio_set_volume(new_volume)
 
 
+    # Playback Speed/Rate:
     def speed_changed_handler(self, val):
         print(val)
         self.media_player.set_rate(val)
         # self.media_player.set_rate(self.ui.doubleSpinBoxPlaybackSpeed.value())
         # TODO: Fix playback speed. Print current playback rate (to a label or something, so the user can see).
-
 
     def speed_up_handler(self):
         self.modify_rate(0.1)
@@ -376,10 +380,11 @@ class MainWindow(QMainWindow):
         self.media_is_playing = not self.media_is_playing
         self.play_pause_model.setState(not self.media_is_playing)
 
+    # Info labels above the video that display the FPS/frame/time/etc info
     def update_video_file_play_labels(self):
-        curr_total_fps = self.media_player.get_fps()
+        curr_total_fps = self.get_media_fps()
         curr_total_duration = self.media_player.get_length()
-        totalNumFrames = int(curr_total_duration * curr_total_fps)
+        totalNumFrames = self.get_media_total_num_frames()
         if totalNumFrames > 0:
             self.ui.lblTotalFrames.setText(str(totalNumFrames))
         else:
@@ -416,11 +421,11 @@ class MainWindow(QMainWindow):
         else:
             self.ui.lblVideoName.setText(self.video_filename)
             # Only updated when the video file is changed:
-            curr_total_fps = self.media_player.get_fps()
+            curr_total_fps = self.get_media_fps()
             self.ui.lblFileFPS.setText(str(curr_total_fps))
 
             curr_total_duration = self.media_player.get_length()
-            totalNumFrames = int(curr_total_duration * curr_total_fps)
+            totalNumFrames = self.get_media_total_num_frames()
             if totalNumFrames > 0:
                 self.ui.lblTotalFrames.setText(str(totalNumFrames))
             else:
@@ -433,10 +438,22 @@ class MainWindow(QMainWindow):
 
             self.update_video_file_play_labels()
 
+    # Media Information:
     def get_frame_multipler(self):
         return self.ui.spinBoxFrameJumpMultiplier.value
 
-    def seek_left_handler(self):
+    def get_media_fps(self):
+        return (self.media_player.get_fps() or 30)
+
+    def get_milliseconds_per_frame(self):
+        """Milliseconds per frame"""
+        return int(1000 // self.get_media_fps())
+
+    def get_media_total_num_frames(self):
+        return int(self.media_player.get_length() * self.get_media_fps())
+
+    # Playback Navigation (Left/Right) Handlers:
+    def step_left_handler(self):
         print('seek: left')
         self.seek_frames(-10 * self.get_frame_multipler())
 
@@ -444,7 +461,7 @@ class MainWindow(QMainWindow):
         print('skip: left')
         self.seek_frames(-1 * self.get_frame_multipler())
 
-    def seek_right_handler(self):
+    def step_right_handler(self):
         print('seek: right')
         self.seek_frames(10 * self.get_frame_multipler())
 
@@ -452,6 +469,7 @@ class MainWindow(QMainWindow):
         print('skip: right')
         self.seek_frames(1 * self.get_frame_multipler())
 
+    # Other:
     def seek_frames(self, relativeFrameOffset):
         """Jump a certain number of frames forward or back
         """
@@ -461,15 +479,12 @@ class MainWindow(QMainWindow):
         # if self.media_end_time == -1:
         #     return
 
-        curr_total_fps = self.media_player.get_fps()
+        curr_total_fps = self.get_media_fps()
         relativeSecondsOffset = relativeFrameOffset / curr_total_fps # Desired offset in seconds
         curr_total_duration = self.media_player.get_length()
         relative_percent_offset = relativeSecondsOffset / curr_total_duration # percent of the whole that we want to skip
 
-
-
-
-        totalNumFrames = int(curr_total_duration * curr_total_fps)
+        totalNumFrames = self.get_media_total_num_frames()
 
         try:
             didPauseMedia = False
@@ -519,6 +534,8 @@ class MainWindow(QMainWindow):
         self.ui.frame_video.setFocus()
         self.is_full_screen = not self.is_full_screen
 
+
+    # File Loading:
     def browse_timestamp_handler(self):
         """
         Handler when the timestamp browser button is clicked
